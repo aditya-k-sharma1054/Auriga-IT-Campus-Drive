@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum SpotType {
+  COMPACT
+  STANDARD
+  EV
+}
+
+enum SpotStatus {
+  AVAILABLE
+  OCCUPIED
+}
+
+enum VehicleType {
+  COMPACT
+  STANDARD
+  EV
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  passwordHash String
+  garageId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  garage Garage @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  @@index([garageId])
+}
+
+model Garage {
+  id String @id @default(uuid())
+  name String
+  address String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users User[]
+  spots ParkingSpot[]
+  sessions ParkingSession[]
+  rates SpotRate[]
+}
+
+model SpotRate {
+  id String @id @default(uuid())
+  garageId String
+  spotType SpotType
+  firstHourRatePaisa Int
+  additionalHourRatePaisa Int
+  dailyCapPaisa Int
+  importedAt DateTime @default(now())
+  garage Garage @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  @@unique([garageId, spotType])
+  @@index([garageId])
+}
+
+model ParkingSpot {
+  id String @id @default(uuid())
+  garageId String
+  floor Int
+  number String
+  type SpotType
+  status SpotStatus @default(AVAILABLE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  garage Garage @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  sessions ParkingSession[]
+  @@unique([garageId, floor, number])
+  @@index([garageId, type, status])
+}
+
+model ParkingSession {
+  id String @id @default(uuid())
+  garageId String
+  spotId String
+  plateNumber String
+  vehicleType VehicleType
+  checkedInAt DateTime
+  checkedOutAt DateTime?
+  feePaisa Int?
+  status SessionStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  garage Garage @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  spot ParkingSpot @relation(fields: [spotId], references: [id], onDelete: Restrict)
+  plateTransfers PlateTransfer[]
+  @@index([garageId, status])
+  @@index([garageId, plateNumber, status])
+  @@index([garageId, checkedInAt])
+  @@index([garageId, checkedOutAt])
+}
+
+model PlateTransfer {
+  id String @id @default(uuid())
+  sessionId String
+  previousPlateNumber String
+  newPlateNumber String
+  transferredAt DateTime @default(now())
+  session ParkingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  @@index([sessionId])
+}
