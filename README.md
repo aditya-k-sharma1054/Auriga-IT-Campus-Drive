@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ParkOps
 
 ParkOps is an attendant-first parking-operations system for multi-level garages. It supports vehicle check-in, compatible bay allocation, EV-only EV bays, backend fee calculation, checkout, live plate lookup, history, per-spot-type rates, a testable nightly auto-close routine, and valet plate transfers.
@@ -60,3 +61,8 @@ All protected routes require `Authorization: Bearer <JWT>`.
 - Partial hours round up; rates use first-hour, additional-hour, and daily-cap amounts.
 - Check-in and checkout update session/spot state together in a transaction.
 
+=======
+# Auriga-IT-Campus-Drive
+
+its a repository made specifically for Auriga IT collge campus placement drive 
+>>>>>>> e0cfa3cbb37961dd5b2cb465779b177d6c250fc4
